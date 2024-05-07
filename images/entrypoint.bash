@@ -2,8 +2,6 @@
 
 set -Eeuo pipefail
 
-# source /etc/profile
-
 function set_start_time() {
   START_TIME=$(date '+%s.%N')
 }
@@ -51,12 +49,13 @@ if [ -d "/mnt/auto" ]; then
   NAS_MOUNTED=1
 fi
 
-mkdir -p ${NAS_DIR}
-
 if [ "$NAS_MOUNTED" == "0" ]; then
   echo "without NAS"
+  export NAS_DIR=/home/paas/comfyui
+  mkdir -p ${NAS_DIR}
 else
   echo "with NAS"
+  mkdir -p ${NAS_DIR}
 
 
 
