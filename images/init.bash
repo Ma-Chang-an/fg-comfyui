@@ -53,9 +53,6 @@ export PATH="${VIRTUAL_ENV}/bin:$PATH"
 echo "ep"/etc/profile
 grep -r "/venv" /venv/bin/* | awk -F: '{print $1}' | xargs -I {} sed "s@/venv@${VIRTUAL_ENV}@" -i {}
 
-echo "export VIRTUAL_ENV=${VIRTUAL_ENV}" >> /etc/profile
-echo "export PATH=${PATH}" >> /etc/profile
-
 mkdir -p ${VIRTUAL_NAS}/input ${VIRTUAL_NAS}/output ${VIRTUAL_NAS}/temp ${VIRTUAL_NAS}/custom_nodes
 
 # 映射自定义节点 builtin => nas
@@ -74,11 +71,6 @@ mount_folder_files ${COMFYUI}/input ${VIRTUAL_NAS}/input
 
 # 初始化额外模型文件 nas => comfyui
 copy_file_if_not_exist "/docker/built-in/extra_model_paths.yaml" "${VIRTUAL_NAS}/extra_model_paths.yaml"
-
-
-# 复制内置文件
-cp /docker/entrypoint.bash /entrypoint.bash
-chmod a+x /entrypoint.bash
 
 # 写入镜像版本
 IMAGE_TAG="${IMAGE_TAG:-$(date +%y%m%d%H%M%S)}" && echo "${IMAGE_TAG}" > /IMAGE_TAG

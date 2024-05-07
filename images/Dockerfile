@@ -47,6 +47,16 @@ ENV BUILTIN="/built-in"
 ENV COMFYUI="/comfyui"
 ENV NAS_DIR="/mnt/auto/comfyui"
 ENV VIRTUAL_NAS="/virtual_nas"
+ENV GROUP_ID=1003
+ENV USER_ID=1003
+ENV GROUP_NAME=paas
+ENV USER_NAME=paas
+ENV VIRTUAL_ENV="${NAS_DIR}/venv"
+
+RUN groupadd -g ${GROUP_ID} ${GROUP_NAME} && \
+    useradd -m -u ${USER_ID} -g ${GROUP_ID} ${USER_NAME}
+RUN sed -i 's/http:\/\/deb.debian.org/http:\/\/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list && \
+    sed -i 's/http:\/\/security.debian.org/http:\/\/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list
 
 RUN --mount=type=cache,target=/var/cache/apt \
     apt update && \
@@ -55,20 +65,20 @@ RUN --mount=type=cache,target=/var/cache/apt \
     gcc g++ unzip build-essential
 
 # 从依赖镜像获取所需的依赖文件，并映射至 /mnt/auto/comfyui
-RUN --mount=type=bind,from=deps,source=/venv,target=/comfyui_venv \
-    mkdir -p /venv && \
-    cp -R /comfyui_venv/* /venv
+COPY --from=deps --chown=${USER_NAME}:${GROUP_NAME} /venv /venv
 
 # 获取 ComfyUI 代码
-RUN --mount=type=bind,from=repos,source=/code,target=/code \
-    mkdir -p ${COMFYUI} && \
-    cp -R /code/* ${COMFYUI} 
+COPY --from=repos --chown=${USER_NAME}:${GROUP_NAME} /code ${COMFYUI} 
+# 复制内置文件
+COPY --chown=${USER_NAME}:${GROUP_NAME} --chmod=a+x ./entrypoint.bash /entrypoint.bash
 
 # 使用 venv 环境
 ENV VIRTUAL_ENV="/venv"
 ENV PATH="${VIRTUAL_ENV}/bin:$PATH"
 
-WORKDIR ${COMFYUI}
+RUN touch /IMAGE_TAG && chown ${USER_NAME}:${GROUP_NAME} /IMAGE_TAG
+
+WORKDIR /
 
 # 确保依赖最新
 RUN --mount=type=cache,target=/root/.cache/pip \
@@ -77,7 +87,11 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 # 移动自带文件
 RUN mkdir -p ${BUILTIN}/custom_nodes && \
+    chown ${USER_NAME}:${GROUP_NAME} ${BUILTIN}/custom_nodes && \
     mv ${COMFYUI}/custom_nodes/* ${BUILTIN}/custom_nodes
+
+RUN mkdir -p ${VIRTUAL_NAS} && chown ${USER_NAME}:${GROUP_NAME} ${VIRTUAL_NAS}
+RUN rm -rf /home/paas && chown ${USER_NAME}:${GROUP_NAME} /home
 
 
 ARG IMAGE_TAG="${IMAGE_TAG}"
@@ -87,10 +101,13 @@ ENTRYPOINT [ "/entrypoint.bash" ]
 
 FROM base as builtin
 
-COPY . /docker
+COPY --chown=${USER_NAME}:${GROUP_NAME}  . /docker
 
 # lite 轻量版镜像
 FROM base as lite
+
+ENV PATH="${VIRTUAL_ENV}/bin:$PATH"
+USER ${USER_NAME}
 
 RUN --mount=type=bind,from=builtin,source=/docker,target=/docker \
     bash /docker/init.bash
@@ -98,19 +115,18 @@ RUN --mount=type=bind,from=builtin,source=/docker,target=/docker \
 # sd1.5 内置 sd1.5 模型及推荐自定义节点的镜像
 FROM base as sd1.5
 
+ENV PATH="${VIRTUAL_ENV}/bin:$PATH"
 # 内置模型
-RUN --mount=type=bind,from=models,source=/models,target=/models \
-    mkdir -p ${BUILTIN}/models/checkpoints && \
-    cp -R /models/* ${BUILTIN}/models/checkpoints
+COPY --from=models --chown=${USER_NAME}:${GROUP_NAME} /models ${BUILTIN}/models/checkpoints
 
 # 内置自定义节点
-RUN --mount=type=bind,from=custom_nodes,source=/custom_nodes,target=/custom_nodes \
-    mkdir -p ${BUILTIN}/custom_nodes && \
-    cp -R /custom_nodes/* ${BUILTIN}/custom_nodes
+COPY --from=custom_nodes --chown=${USER_NAME}:${GROUP_NAME} /custom_nodes ${BUILTIN}/custom_nodes
 
 # 更新依赖至最新
 RUN --mount=type=cache,target=/root/.cache/pip \
     find ${BUILTIN}/custom_nodes -type f -name requirements.txt | xargs -I {} pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r {}
+
+USER ${USER_NAME}
 
 RUN --mount=type=bind,from=builtin,source=/docker,target=/docker \
     bash /docker/init.bash

@@ -2,7 +2,7 @@
 
 set -Eeuo pipefail
 
-source /etc/profile
+# source /etc/profile
 
 function set_start_time() {
   START_TIME=$(date '+%s.%N')
@@ -34,9 +34,10 @@ function mount_builtin_files() {
   mount_file_if_not_exist "${NAS_DIR}/models" "${COMFYUI}/models"
 
   mkdir -p "${NAS_DIR}/root"  "${NAS_DIR}/temp" 
-  rm -rf /root /tmp
-  mount_file_if_not_exist "${NAS_DIR}/root" "/root"
-  mount_file_if_not_exist "${NAS_DIR}/temp" "/tmp"
+  # rm -rf /home/paas
+  # rm -rf /tmp
+  mount_file_if_not_exist "${NAS_DIR}/root" "/home/paas"
+  # mount_file_if_not_exist "${NAS_DIR}/temp" "/tmp"
 
   show_cost_time "mount built-in files"
 }
@@ -86,7 +87,7 @@ export ARGS="${CLI_ARGS} ${EXTRA_ARGS}"
 
 echo "args: $ARGS"
 
-export PYTHONPATH="${COMFYUI}:${PYTHONPATH:-}"
+export PYTHONPATH="${NAS_DIR}/comfyui/venv:${COMFYUI}:${PYTHONPATH:-}"
 
 if [ -f "${NAS_DIR}/startup.sh" ]; then
   pushd ${ROOT}
