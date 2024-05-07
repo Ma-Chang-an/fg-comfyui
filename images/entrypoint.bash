@@ -44,9 +44,24 @@ function mount_builtin_files() {
 # 内置模型准备
 # 如果挂载了 NAS，软链接到 NAS 中
 # 如果未挂载 NAS，则尝试直接将内置模型过载
+count=0
 NAS_MOUNTED=0
-if [ -d "/mnt/auto" ]; then
-  NAS_MOUNTED=1
+while [ $count -lt 25 ]
+do
+    if [ -d "/mnt/auto" ]
+    then
+        echo "Directory /mnt/auto exists. Begin Mount."
+        NAS_MOUNTED=1
+	    break
+    else
+        echo "Directory /mnt/auto does not exist. Waiting for 1 seconds."
+        sleep 1
+        count=$((count+1))
+    fi
+done
+if [ $count -ge 25 ]; then
+  echo "Directory /mnt/auto does not exist. Maximum wait time exceeded."
+  #mount_file "$SD_BUILTIN" "${NAS_DIR}"
 fi
 
 if [ "$NAS_MOUNTED" == "0" ]; then
