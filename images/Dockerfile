@@ -16,7 +16,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     scipy \
     tqdm \
     psutil \
-    kornia>=0.7.1
+    kornia>=0.7.1 -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 FROM alpine/git:2.36.2 as repos
 
@@ -38,7 +38,7 @@ FROM python:3.10.9-slim as models
 
 RUN apt update && apt install -y aria2
 
-RUN aria2c -x 16 --dir "/models" --out "sd-v1-5-inpainting.ckpt" "https://huggingface.co/runwayml/stable-diffusion-inpainting/resolve/main/sd-v1-5-inpainting.ckpt"
+RUN aria2c -x 16 --dir "/models" --out "AWPortrait_v1.4.safetensors" "https://liblibai-online.vibrou.com/web/model/43d9ee875a6288176ac10d689a2770c7/1d66b36bd7444a921e90eae5f5a1fd56ea46e5f5a9d0b87db0f51db299a165bc.safetensors?attname=AWPortrait_v1.4.safetensors"
 
 
 FROM python:3.10.9-slim as base
@@ -72,8 +72,8 @@ WORKDIR ${COMFYUI}
 
 # 确保依赖最新
 RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install -r ${COMFYUI}/requirements.txt --no-cache-dir && \ 
-    find ${COMFYUI} -type f -name requirements.txt | xargs -I {} pip install -r {}
+    pip install -r ${COMFYUI}/requirements.txt --no-cache-dir -i https://pypi.tuna.tsinghua.edu.cn/simple && \ 
+    find ${COMFYUI} -type f -name requirements.txt | xargs -I {} pip install -r {} -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # 移动自带文件
 RUN mkdir -p ${BUILTIN}/custom_nodes && \
@@ -110,7 +110,7 @@ RUN --mount=type=bind,from=custom_nodes,source=/custom_nodes,target=/custom_node
 
 # 更新依赖至最新
 RUN --mount=type=cache,target=/root/.cache/pip \
-    find ${BUILTIN}/custom_nodes -type f -name requirements.txt | xargs -I {} pip install -r {}
+    find ${BUILTIN}/custom_nodes -type f -name requirements.txt | xargs -I {} pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r {}
 
 RUN --mount=type=bind,from=builtin,source=/docker,target=/docker \
     bash /docker/init.bash
