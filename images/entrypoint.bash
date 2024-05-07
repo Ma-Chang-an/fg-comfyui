@@ -79,7 +79,7 @@ fi
 
 mount_builtin_files
 
-CLI_ARGS="${CLI_ARGS:---listen 0.0.0.0 --port 9000 --input-directory ${NAS_DIR}/input --output-directory ${NAS_DIR}/output --temp-directory ${NAS_DIR}/output}"
+CLI_ARGS="${CLI_ARGS:---listen 0.0.0.0 --port 8000 --input-directory ${NAS_DIR}/input --output-directory ${NAS_DIR}/output --temp-directory ${NAS_DIR}/output}"
 EXTRA_ARGS="${EXTRA_ARGS:-}"
 
 export ARGS="${CLI_ARGS} ${EXTRA_ARGS}"

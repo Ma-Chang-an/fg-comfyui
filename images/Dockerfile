@@ -109,6 +109,8 @@ FROM base as lite
 ENV PATH="${VIRTUAL_ENV}/bin:$PATH"
 USER ${USER_NAME}
 
+EXPOSE 8000
+
 RUN --mount=type=bind,from=builtin,source=/docker,target=/docker \
     bash /docker/init.bash
 
@@ -127,6 +129,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     find ${BUILTIN}/custom_nodes -type f -name requirements.txt | xargs -I {} pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r {}
 
 USER ${USER_NAME}
+
+EXPOSE 8000
 
 RUN --mount=type=bind,from=builtin,source=/docker,target=/docker \
     bash /docker/init.bash
