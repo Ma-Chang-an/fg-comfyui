@@ -1,0 +1,62 @@
+{
+    "zh-cn": [
+        {
+            "type": "select",
+            "id": "apigId",
+            "label": "APIG实例",
+            "outputKey": "apig_id",
+            "labelWidth": "120px",
+            "source": {
+                "type": "http",
+                "url": "/functiongraph/rest/romaapic/v2/{projectId}/apigw/instances?limit=500&status=Running",
+                "headers": {
+                    "X-Target-Services": "apig-iam5"
+                },
+                "serviceName": "functiongraph",
+                "valuePath": "instances"
+            },
+            "props": {
+                "labelKey": "instance_name",
+                "valueKey": "id",
+                "defaultValueIndex": 0
+            },
+            "link": {
+                "label": "创建实例",
+                "url": "/apig2/#/manage/instanceStep1"
+            },
+            "validators": {
+                "required": ""
+            }
+        }
+    ],
+    "en-us": [
+        {
+            "type": "select",
+            "id": "apigId",
+            "label": "APIG Instance",
+            "outputKey": "apig_id",
+            "labelWidth": "120px",
+            "source": {
+                "type": "http",
+                "url": "/functiongraph/rest/romaapic/v2/{projectId}/apigw/instances?limit=500&status=Running",
+                "headers": {
+                    "X-Target-Services": "apig-iam5"
+                },
+                "serviceName": "functiongraph",
+                "valuePath": "instances"
+            },
+            "props": {
+                "labelKey": "instance_name",
+                "valueKey": "id",
+                "defaultValueIndex": 0
+            },
+            "link": {
+                "label": "Create Instance",
+                "url": "/apig2/#/manage/instanceStep1"
+            },
+            "validators": {
+                "required": ""
+            }
+        }
+    ]
+}

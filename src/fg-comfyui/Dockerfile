@@ -38,7 +38,7 @@ FROM python:3.10.9-slim as models
 
 RUN apt update && apt install -y aria2
 
-RUN aria2c -x 16 --dir "/models" --out "AWPortrait_v1.4.safetensors" "https://liblibai-online.vibrou.com/web/model/43d9ee875a6288176ac10d689a2770c7/1d66b36bd7444a921e90eae5f5a1fd56ea46e5f5a9d0b87db0f51db299a165bc.safetensors?attname=AWPortrait_v1.4.safetensors"
+RUN aria2c -x 16 --dir "/models" --out "v1-5-pruned-emaonly.safetensors" "https://hf-mirror.com/runwayml/stable-diffusion-v1-5/blob/main/v1-5-pruned-emaonly.safetensors"
 
 
 FROM python:3.10.9-slim as base

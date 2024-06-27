@@ -1,0 +1,12 @@
+app-template:
+  name: '{"zh-cn": "AI绘画ComfyUI", "en-us": "AI Drawing ComfyUI"}'
+  description: '{"zh-cn": "AI绘画 ComfyUI版","en-us": "AI Drawing with ComfyUI"}'
+  path: fg-comfyui
+  runtime: http
+  category: '{"zh-cn": "AI", "en-us": "AI"}'
+  image: fg-comfyui.png
+  type: "AIGC"
+  functions:
+    comfyui:
+      config: "{\"memory_size\":32768,\"gpu_memory\":16384,\"is_websocket_function\":true,\"strategy_config\":{\"concurrency\":1,\"concurrent_num\":100}}"
+    custom_models_tool:
