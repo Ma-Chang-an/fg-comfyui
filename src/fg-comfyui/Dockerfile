@@ -1,3 +1,4 @@
+# syntax = docker/dockerfile:experimental
 FROM python:3.10.9-slim as deps
 
 RUN --mount=type=cache,target=/root/.cache/pip \
@@ -38,7 +39,7 @@ FROM python:3.10.9-slim as models
 
 RUN apt update && apt install -y aria2
 
-RUN aria2c -x 16 --dir "/models" --out "v1-5-pruned-emaonly.safetensors" "https://hf-mirror.com/runwayml/stable-diffusion-v1-5/blob/main/v1-5-pruned-emaonly.safetensors"
+RUN aria2c -x 16 --dir "/models" --out "sd-v1-5-inpainting.ckpt" "https://huggingface.co/runwayml/stable-diffusion-inpainting/resolve/main/sd-v1-5-inpainting.ckpt"
 
 
 FROM python:3.10.9-slim as base
@@ -70,7 +71,7 @@ COPY --from=deps --chown=${USER_NAME}:${GROUP_NAME} /venv /venv
 # 获取 ComfyUI 代码
 COPY --from=repos --chown=${USER_NAME}:${GROUP_NAME} /code ${COMFYUI} 
 # 复制内置文件
-COPY --chown=${USER_NAME}:${GROUP_NAME} --chmod=a+x ./entrypoint.bash /entrypoint.bash
+COPY --chown=${USER_NAME}:${GROUP_NAME} ./entrypoint.bash /entrypoint.bash
 
 # 使用 venv 环境
 ENV VIRTUAL_ENV="/venv"
@@ -114,6 +115,8 @@ EXPOSE 8000
 RUN --mount=type=bind,from=builtin,source=/docker,target=/docker \
     bash /docker/init.bash
 
+RUN chmod a+x /entrypoint.bash
+
 # sd1.5 内置 sd1.5 模型及推荐自定义节点的镜像
 FROM base as sd1.5
 
@@ -134,3 +137,5 @@ EXPOSE 8000
 
 RUN --mount=type=bind,from=builtin,source=/docker,target=/docker \
     bash /docker/init.bash
+
+RUN chmod a+x /entrypoint.bash
