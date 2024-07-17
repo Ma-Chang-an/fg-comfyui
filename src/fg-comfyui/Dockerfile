@@ -107,7 +107,8 @@ COPY --chown=${USER_NAME}:${GROUP_NAME}  . /docker
 # lite 轻量版镜像
 FROM base as lite
 
-ENV PATH="${VIRTUAL_ENV}/bin:$PATH"
+ENV PATH="${NAS_DIR}/venv/bin:$PATH"
+RUN chmod 666 /etc/profile
 USER ${USER_NAME}
 
 EXPOSE 8000
@@ -120,7 +121,7 @@ RUN chmod a+x /entrypoint.bash
 # sd1.5 内置 sd1.5 模型及推荐自定义节点的镜像
 FROM base as sd1.5
 
-ENV PATH="${VIRTUAL_ENV}/bin:$PATH"
+ENV PATH="${NAS_DIR}/venv/bin:$PATH"
 # 内置模型
 COPY --from=models --chown=${USER_NAME}:${GROUP_NAME} /models ${BUILTIN}/models/checkpoints
 
@@ -131,6 +132,7 @@ COPY --from=custom_nodes --chown=${USER_NAME}:${GROUP_NAME} /custom_nodes ${BUIL
 RUN --mount=type=cache,target=/root/.cache/pip \
     find ${BUILTIN}/custom_nodes -type f -name requirements.txt | xargs -I {} pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r {}
 
+RUN chmod 666 /etc/profile
 USER ${USER_NAME}
 
 EXPOSE 8000

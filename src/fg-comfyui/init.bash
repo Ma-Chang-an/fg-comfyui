@@ -53,6 +53,9 @@ export PATH="${VIRTUAL_ENV}/bin:$PATH"
 echo "ep"/etc/profile
 grep -r "/venv" /venv/bin/* | awk -F: '{print $1}' | xargs -I {} sed "s@/venv@${VIRTUAL_ENV}@" -i {}
 
+echo "export VIRTUAL_ENV=${VIRTUAL_ENV}" >> /etc/profile
+echo "export PATH=${PATH}" >> /etc/profile
+
 mkdir -p ${VIRTUAL_NAS}/input ${VIRTUAL_NAS}/output ${VIRTUAL_NAS}/temp ${VIRTUAL_NAS}/custom_nodes
 
 # 映射自定义节点 builtin => nas
