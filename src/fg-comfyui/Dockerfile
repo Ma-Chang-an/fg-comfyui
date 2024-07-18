@@ -72,6 +72,7 @@ COPY --from=deps --chown=${USER_NAME}:${GROUP_NAME} /venv /venv
 COPY --from=repos --chown=${USER_NAME}:${GROUP_NAME} /code ${COMFYUI} 
 # 复制内置文件
 COPY --chown=${USER_NAME}:${GROUP_NAME} ./entrypoint.bash /entrypoint.bash
+COPY --chown=${USER_NAME}:${GROUP_NAME} ./built-in ${BUILTIN}
 
 # 使用 venv 环境
 ENV VIRTUAL_ENV="/venv"
@@ -87,9 +88,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     find ${COMFYUI} -type f -name requirements.txt | xargs -I {} pip install -r {} -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # 移动自带文件
-RUN mkdir -p ${BUILTIN}/custom_nodes && \
-    chown ${USER_NAME}:${GROUP_NAME} ${BUILTIN}/custom_nodes && \
-    mv ${COMFYUI}/custom_nodes/* ${BUILTIN}/custom_nodes
+RUN mv ${COMFYUI}/custom_nodes/* ${BUILTIN}/custom_nodes
 
 RUN mkdir -p ${VIRTUAL_NAS} && chown ${USER_NAME}:${GROUP_NAME} ${VIRTUAL_NAS}
 RUN rm -rf /home/paas && chown ${USER_NAME}:${GROUP_NAME} /home

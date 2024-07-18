@@ -56,7 +56,7 @@ grep -r "/venv" /venv/bin/* | awk -F: '{print $1}' | xargs -I {} sed "s@/venv@${
 echo "export VIRTUAL_ENV=${VIRTUAL_ENV}" >> /etc/profile
 echo "export PATH=${PATH}" >> /etc/profile
 
-mkdir -p ${VIRTUAL_NAS}/input ${VIRTUAL_NAS}/output ${VIRTUAL_NAS}/temp ${VIRTUAL_NAS}/custom_nodes
+mkdir -p ${VIRTUAL_NAS}/input ${VIRTUAL_NAS}/output ${VIRTUAL_NAS}/temp ${VIRTUAL_NAS}/custom_nodes ${VIRTUAL_NAS}/root/.pip
 
 # 映射自定义节点 builtin => nas
 mount_folder_files ${BUILTIN}/custom_nodes ${VIRTUAL_NAS}/custom_nodes
@@ -68,6 +68,8 @@ rm -rf ${COMFYUI}/models
 if [ -e ${BUILTIN}/models ]; then 
   mount_all_files "${BUILTIN}/models" "${VIRTUAL_NAS}/models"
 fi
+ 
+mount_folder_files ${BUILTIN}/root/.pip ${VIRTUAL_NAS}/root/.pip
 
 # 映射 input 文件 builtin => nas
 mount_folder_files ${COMFYUI}/input ${VIRTUAL_NAS}/input
