@@ -46,7 +46,7 @@ $el("style", {
  * 预估费用
  */
 function calcCost(seconds) {
-    return `${(seconds * 0.0025008).toFixed(2)} 元`
+    return `${(seconds * 0.01475456).toFixed(2)} 元`
 }
 
 /**
