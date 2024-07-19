@@ -1,0 +1,4 @@
+Flask
+websocket-client==1.4.2
+requests==2.25.1
+Pillow==9.5.0
