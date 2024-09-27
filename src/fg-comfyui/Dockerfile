@@ -23,7 +23,7 @@ FROM alpine/git:2.36.2 as repos
 
 RUN git clone https://github.com/comfyanonymous/ComfyUI.git /code && \
     cd /code && \
-    git checkout 0a03009808a5ad13fa3a44edbabcae68576c3982 && \
+    git checkout v0.2.2 && \
     rm -rf .git
 
 FROM alpine/git:2.36.2 as custom_nodes
@@ -39,7 +39,7 @@ FROM python:3.10.9-slim as models
 
 RUN apt update && apt install -y aria2
 
-RUN aria2c -x 16 --dir "/models" --out "sd-v1-5-inpainting.ckpt" "https://huggingface.co/runwayml/stable-diffusion-inpainting/resolve/main/sd-v1-5-inpainting.ckpt"
+RUN aria2c -x 16 --dir "/models" --out "flux1-dev-fp8.safetensors" "https://huggingface.co/lllyasviel/flux1_dev/resolve/main/flux1-dev-fp8.safetensors?download=true"
 
 
 FROM python:3.10.9-slim as base
@@ -117,8 +117,8 @@ RUN --mount=type=bind,from=builtin,source=/docker,target=/docker \
 
 RUN chmod a+x /entrypoint.bash
 
-# sd1.5 内置 sd1.5 模型及推荐自定义节点的镜像
-FROM base as sd1.5
+# flux 内置 flux1-dev-fp8 模型及推荐自定义节点的镜像
+FROM base as flux
 
 ENV PATH="${NAS_DIR}/venv/bin:$PATH"
 # 内置模型
