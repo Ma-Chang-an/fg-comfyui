@@ -30,6 +30,7 @@ function mount_builtin_files() {
   mount_file_if_not_exist ${NAS_DIR}/custom_nodes ${COMFYUI}/custom_nodes
   mount_file_if_not_exist "${NAS_DIR}/extra_model_paths.yaml" "${COMFYUI}/extra_model_paths.yaml"
   mount_file_if_not_exist "${NAS_DIR}/models" "${COMFYUI}/models"
+  mount_file_if_not_exist "${NAS_DIR}/user" "${COMFYUI}/user"
 
   mkdir -p "${NAS_DIR}/root"  "${NAS_DIR}/temp" 
   # rm -rf /home/paas

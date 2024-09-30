@@ -41,6 +41,12 @@ RUN apt update && apt install -y aria2
 
 RUN aria2c -x 16 --dir "/models" --out "flux1-dev-fp8.safetensors" "https://huggingface.co/lllyasviel/flux1_dev/resolve/main/flux1-dev-fp8.safetensors?download=true"
 
+FROM python:3.10.9-slim as lora
+
+RUN apt update && apt install -y aria2
+
+RUN aria2c -x 16 --dir "/loras" --out "wukong.safetensors" "https://test-oms.obs.ap-southeast-1.myhuaweicloud.com/flux_wukong.safetensors"
+
 
 FROM python:3.10.9-slim as base
 
@@ -130,6 +136,8 @@ COPY --from=custom_nodes --chown=${USER_NAME}:${GROUP_NAME} /custom_nodes ${BUIL
 # 更新依赖至最新
 RUN --mount=type=cache,target=/root/.cache/pip \
     find ${BUILTIN}/custom_nodes -type f -name requirements.txt | xargs -I {} pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r {}
+
+COPY --from=lora --chown=${USER_NAME}:${GROUP_NAME} /loras ${BUILTIN}/models/loras
 
 RUN chmod 666 /etc/profile
 USER ${USER_NAME}

@@ -56,7 +56,7 @@ grep -r "/venv" /venv/bin/* | awk -F: '{print $1}' | xargs -I {} sed "s@/venv@${
 echo "export VIRTUAL_ENV=${VIRTUAL_ENV}" >> /etc/profile
 echo "export PATH=${PATH}" >> /etc/profile
 
-mkdir -p ${VIRTUAL_NAS}/input ${VIRTUAL_NAS}/output ${VIRTUAL_NAS}/temp ${VIRTUAL_NAS}/custom_nodes ${VIRTUAL_NAS}/root/.pip
+mkdir -p ${VIRTUAL_NAS}/input ${VIRTUAL_NAS}/output ${VIRTUAL_NAS}/temp ${VIRTUAL_NAS}/custom_nodes ${VIRTUAL_NAS}/root/.pip ${VIRTUAL_NAS}/user
 
 # 映射自定义节点 builtin => nas
 mount_folder_files ${BUILTIN}/custom_nodes ${VIRTUAL_NAS}/custom_nodes
@@ -73,6 +73,8 @@ mount_folder_files ${BUILTIN}/root/.pip ${VIRTUAL_NAS}/root/.pip
 
 # 映射 input 文件 builtin => nas
 mount_folder_files ${COMFYUI}/input ${VIRTUAL_NAS}/input
+
+mount_all_files ${BUILTIN}/user ${VIRTUAL_NAS}/user
 
 # 初始化额外模型文件 nas => comfyui
 copy_file_if_not_exist "/docker/built-in/extra_model_paths.yaml" "${VIRTUAL_NAS}/extra_model_paths.yaml"
